@@ -127,7 +127,7 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	SDL_free(spirv);
 	return final_output;
 #else
-	/* FIXME: Do we need an error message? */
+	SHD_SetError("SDL_shader was compiled without GLSL support");
 	return NULL;
 #endif
 }

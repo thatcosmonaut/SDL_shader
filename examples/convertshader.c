@@ -62,14 +62,16 @@ int main(int argc, char** argv)
     hlslText = SHD_TranslateFromGLSL(SDL_GPU_BACKEND_D3D11, SDL_GPU_SHADERTYPE_FRAGMENT, (void*) GLSL_CODE, SDL_strlen(GLSL_CODE), &hlslLength);
     if (!hlslText)
     {
+        /* This isn't fatal, the library may have not been compiled with GLSL support */
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s\n", SHD_GetError());
-        return 1;
     }
+    else
+    {
+        now = SDL_GetTicks();
 
-    now = SDL_GetTicks();
-
-    SDL_Log("Translated GLSL shader to HLSL in %llu milliseconds | HLSL size %llu:\n%s\n\n", (now - then), hlslLength, hlslText);
-    SDL_free((void*) hlslText);
+        SDL_Log("Translated GLSL shader to HLSL in %llu milliseconds | HLSL size %llu:\n%s\n\n", (now - then), hlslLength, hlslText);
+        SDL_free((void*)hlslText);
+    }
 
     SHD_Quit();
 
