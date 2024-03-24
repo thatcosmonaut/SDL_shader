@@ -39,9 +39,6 @@
     <ClCompile Include="..\external\SPIRV-Cross\spirv_cross_parsed_ir.cpp">
       <Filter>Source Files\spirv-cross</Filter>
     </ClCompile>
-    <ClCompile Include="..\external\SPIRV-Cross\spirv_cross_util.cpp">
-      <Filter>Source Files\spirv-cross</Filter>
-    </ClCompile>
     <ClCompile Include="..\external\SPIRV-Cross\spirv_glsl.cpp">
       <Filter>Source Files\spirv-cross</Filter>
     </ClCompile>

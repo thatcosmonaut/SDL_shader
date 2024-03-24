@@ -1,7 +1,9 @@
 #include <SDL3_shader/SDL_shader.h>
 #include <spirv_cross_c.h>
+#if SDL_SHADER_HAS_GLSLANG
 #include <glslang/Include/glslang_c_interface.h>
 #include <glslang/Public/resource_limits_c.h>
+#endif
 
 const SDL_Version *SHD_Linked_Version(void)
 {
@@ -12,21 +14,26 @@ const SDL_Version *SHD_Linked_Version(void)
 
 int SHD_Init(void)
 {
+#if SDL_SHADER_HAS_GLSLANG
 	if (!glslang_initialize_process()) {
 		SHD_SetError("SHD_Init: could not initialize glslang");
 		return -1;
 	}
+#endif
 
 	return 0;
 }
 
 void SHD_Quit(void)
 {
+#if SDL_SHADER_HAS_GLSLANG
 	glslang_finalize_process();
+#endif
 }
 
 const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, void* glsl, size_t glsl_size, size_t* output_size)
 {
+#if SDL_SHADER_HAS_GLSLANG
 	glslang_input_t input;
 	glslang_stage_t stage;
 	glslang_shader_t* shader = NULL;
@@ -119,6 +126,10 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	final_output = SHD_TranslateFromSPIRV(backend, spirv, spirv_size, output_size);
 	SDL_free(spirv);
 	return final_output;
+#else
+	/* FIXME: Do we need an error message? */
+	return NULL;
+#endif
 }
 
 const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t spirv_size, size_t *output_size)

@@ -1,0 +1,9 @@
+SDL3_shader_0.0.0 {
+  global:
+    SHD_Init;
+    SHD_Quit;
+    SHD_Linked_Version;
+    SHD_TranslateFromGLSL;
+    SHD_TranslateFromSPIRV;
+  local: *;
+};
