@@ -59,7 +59,7 @@ void SHD_Quit(void)
 #endif
 }
 
-const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, void* glsl, size_t glsl_size, size_t* output_size)
+const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, const char* glsl, size_t* output_size)
 {
 #if SDL_SHADER_HAS_GLSLANG
 	glslang_input_t input;
@@ -160,7 +160,7 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 #endif
 }
 
-const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t spirv_size, size_t *output_size)
+const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, const char* spirv, size_t spirv_size, size_t* output_size)
 {
 	spvc_backend spvc_backend;
 	spvc_result result;
@@ -173,7 +173,7 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 
 	/* Early out for Vulkan since it consumes SPIR-V directly */
 	if (backend == SDL_GPU_BACKEND_VULKAN) {
-		return (const char*) spirv;
+		return spirv;
 	}
 
 	/* Determine which backend to use */
@@ -195,7 +195,7 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 	}
 
 	/* Parse the SPIR-V into IR */
-	result = spvc_context_parse_spirv(context, spirv, spirv_size / 4, &ir);
+	result = spvc_context_parse_spirv(context, (const SpvId*) spirv, spirv_size / sizeof(SpvId), &ir);
 	if (result < 0) {
 		SHD_SetError("SHD_TranslateFromSPIRV: parse failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
@@ -222,6 +222,9 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 	case SDL_GPU_BACKEND_D3D11:
 		spvc_compiler_options_set_uint(options, SPVC_COMPILER_OPTION_HLSL_SHADER_MODEL, 50);
 		spvc_compiler_options_set_bool(options, SPVC_COMPILER_OPTION_FLIP_VERTEX_Y, SPVC_TRUE);
+		break;
+	default:
+		/* No special settings needed */
 		break;
 	}
 
