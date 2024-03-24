@@ -19,6 +19,34 @@ int SHD_Init(void)
 		SHD_SetError("SHD_Init: could not initialize glslang");
 		return -1;
 	}
+
+	/* Create and preprocess a dummy shader to pre-warm the glslang CommonSymbolTable cache */
+	glslang_input_t input;
+	SDL_zero(input);
+	input.language = GLSLANG_SOURCE_GLSL;
+	input.stage = GLSLANG_STAGE_VERTEX;
+	input.client = GLSLANG_CLIENT_VULKAN;
+	input.client_version = GLSLANG_TARGET_VULKAN_1_0;
+	input.target_language = GLSLANG_TARGET_SPV;
+	input.target_language_version = GLSLANG_TARGET_SPV_1_0;
+	input.code = "void main() { }";
+	input.default_version = 450;
+	input.default_profile = GLSLANG_NO_PROFILE;
+	input.force_default_version_and_profile = SDL_TRUE;
+	input.forward_compatible = false;
+	input.messages = GLSLANG_MSG_DEFAULT_BIT;
+	input.resource = glslang_default_resource();
+
+	glslang_shader_t* shader = glslang_shader_create(&input);
+	if (!shader) {
+		SHD_SetError("SHD_Init: could not create dummy shader on init");
+		return -1;
+	}
+	if (!glslang_shader_preprocess(shader, &input)) {
+		SHD_SetError("SHD_Init: could not preprocess dummy shader on init");
+		return -1;
+	}
+	glslang_shader_delete(shader);
 #endif
 
 	return 0;
@@ -67,9 +95,9 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	input.target_language = GLSLANG_TARGET_SPV;
 	input.target_language_version = GLSLANG_TARGET_SPV_1_0;
 	input.code = glsl;
-	input.default_version = 100;
+	input.default_version = 450;
 	input.default_profile = GLSLANG_NO_PROFILE;
-	input.force_default_version_and_profile = SDL_FALSE;
+	input.force_default_version_and_profile = SDL_TRUE;
 	input.forward_compatible = false;
 	input.messages = GLSLANG_MSG_DEFAULT_BIT;
 	input.resource = glslang_default_resource();
