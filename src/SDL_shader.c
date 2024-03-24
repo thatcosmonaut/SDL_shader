@@ -55,7 +55,7 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 		stage = GLSLANG_STAGE_COMPUTE;
 		break;
 	default:
-		SHD_SetError("SHD_CreateFromGLSL: unknown shader type");
+		SHD_SetError("SHD_TranslateFromGLSL: unknown shader type");
 		return NULL;
 	}
 
@@ -76,25 +76,25 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 
 	shader = glslang_shader_create(&input);
 	if (!shader) {
-		SHD_SetError("SHD_CreateFromGLSL: could not create shader from GLSL");
+		SHD_SetError("SHD_TranslateFromGLSL: could not create shader from GLSL");
 		return NULL;
 	}
 
 	if (!glslang_shader_preprocess(shader, &input)) {
-		SHD_SetError("SHD_CreateFromGLSL: GLSL preprocessing failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
+		SHD_SetError("SHD_TranslateFromGLSL: GLSL preprocessing failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
 		glslang_shader_delete(shader);
 		return NULL;
 	}
 
 	if (!glslang_shader_parse(shader, &input)) {
-		SHD_SetError("SHD_CreateFromGLSL: GLSL parsing failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
+		SHD_SetError("SHD_TranslateFromGLSL: GLSL parsing failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
 		glslang_shader_delete(shader);
 		return NULL;
 	}
 
 	program = glslang_program_create();
 	if (!program) {
-		SHD_SetError("SHD_CreateFromGLSL: program creation failed");
+		SHD_SetError("SHD_TranslateFromGLSL: program creation failed");
 		glslang_shader_delete(shader);
 		return NULL;
 	}
@@ -102,7 +102,7 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	glslang_program_add_shader(program, shader);
 
 	if (!glslang_program_link(program, GLSLANG_MSG_SPV_RULES_BIT | GLSLANG_MSG_VULKAN_RULES_BIT)) {
-		SHD_SetError("SHD_CreateFromGLSL: program linking failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
+		SHD_SetError("SHD_TranslateFromGLSL: program linking failed: %s | %s", glslang_shader_get_info_log(shader), glslang_shader_get_info_debug_log(shader));
 		glslang_program_delete(program);
 		glslang_shader_delete(shader);
 		return NULL;
@@ -155,21 +155,21 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 		spvc_backend = SPVC_BACKEND_HLSL;
 		break;
 	default:
-		SHD_SetError("SHD_CreateFromSpirv: unknown GPU backend");
+		SHD_SetError("SHD_TranslateFromSPIRV: unknown GPU backend");
 		return NULL;
 	}
 
 	/* Create the SPIRV-Cross context */
 	result = spvc_context_create(&context);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: context creation failed: %X", result);
+		SHD_SetError("SHD_TranslateFromSPIRV: context creation failed: %X", result);
 		return NULL;
 	}
 
 	/* Parse the SPIR-V into IR */
 	result = spvc_context_parse_spirv(context, spirv, spirv_size / 4, &ir);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: parse failed: %s", spvc_context_get_last_error_string(context));
+		SHD_SetError("SHD_TranslateFromSPIRV: parse failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
@@ -177,14 +177,14 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 	/* Set up the cross-compiler */
 	result = spvc_context_create_compiler(context, spvc_backend, ir, SPVC_CAPTURE_MODE_TAKE_OWNERSHIP, &compiler);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: compiler creation failed: %s", spvc_context_get_last_error_string(context));
+		SHD_SetError("SHD_TranslateFromSPIRV: compiler creation failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
 
 	result = spvc_compiler_create_compiler_options(compiler, &options);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: compiler options creation failed: %s", spvc_context_get_last_error_string(context));
+		SHD_SetError("SHD_TranslateFromSPIRV: compiler options creation failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
@@ -199,7 +199,7 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 
 	result = spvc_compiler_install_compiler_options(compiler, options);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: compiler options installation failed: %s", spvc_context_get_last_error_string(context));
+		SHD_SetError("SHD_TranslateFromSPIRV: compiler options installation failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
@@ -207,7 +207,7 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t s
 	/* Compile to the target shader language */
 	result = spvc_compiler_compile(compiler, &translated);
 	if (result < 0) {
-		SHD_SetError("SHD_CreateFromSpirv: compile failed: %s", spvc_context_get_last_error_string(context));
+		SHD_SetError("SHD_TranslateFromSPIRV: compile failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
