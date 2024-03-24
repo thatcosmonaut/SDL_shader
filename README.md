@@ -1,6 +1,6 @@
-SDL satellite library for shader translation at runtime or build time. Uses glslangValidator and SPIRV-Cross.
+SDL satellite library for shader translation at runtime or build time. Uses SPIRV-Cross and (optionally) glslangValidator.
 
 Setup:
 * `git clone --recursive`
-* `cd SDL_shader/external`
-* `python ./build_info.py . -i build_info.h.tmpl -o ./glslang/build_info.h`
+* `mkdir build`
+* `cmake .. -DSDL3SHADER_GLSL=ON` (omit if GLSL source translation is not desired)
