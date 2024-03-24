@@ -74,23 +74,40 @@ extern "C" {
 extern DECLSPEC const SDL_Version * SDLCALL SHD_Linked_Version(void);
 
 /**
- * This function creates a shader module for the specified backend by translating GLSL.
- * If needed, it may be first translated into SPIR-V, then to the target language.
+ * This function initializes the SDL_shader system.
+ * It MUST be called before calling any other SHD_Translate* APIs!
+ * \returns Success code (0 on success, -1 on failure)
+ */
+extern DECLSPEC int SDLCALL SHD_Init(void);
+
+/**
+ * This function closes the SDL_shader system.
+ * Do NOT call SHD_* APIs after this has been called!
+ */
+extern DECLSPEC void SDLCALL SHD_Quit(void);
+
+/**
+ * This function translates source GLSL into shader code for the specified backend.
+ * If needed, the GLSL source may be first translated into SPIR-V, then to the target language.
+ * The client is responsible for freeing the memory returned by this call.
  * \param backend The SDL_GPU backend to target
  * \param bytes A pointer to the source GLSL data
  * \param numbytes The length of the source GLSL data, in bytes
- * \returns A shader module compiled with the translated code
+ * \param output_size Pointer to a size_t to hold the length of the output shader data, in bytes
+ * \returns The translated shader bytes to pass into SDL_GpuShaderModuleCreateInfo, or NULL on failure
  */
-extern DECLSPEC SDL_GpuShaderModule* SDLCALL SHD_CreateFromGLSL(SDL_GpuBackend backend, void* bytes, size_t numbytes);
+extern DECLSPEC const char* SDLCALL SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, void* glsl, size_t glsl_size, size_t* output_size);
 
 /**
- * This function creates a shader module for the specified backend by translating SPIR-V.
+ * This function translates source SPIR-V into shader code for the specified backend.
+ * The client is responsible for freeing the memory returned by this call.
  * \param backend The SDL_GPU backend to target
  * \param bytes A pointer to the source SPIR-V data
  * \param numbytes The length of the source SPIR-V data, in bytes
- * \returns A shader module compiled with the translated code
+ * \param output_size Pointer to a size_t to hold the length of the output shader data, in bytes
+ * \returns The translated shader bytes to pass into SDL_GpuShaderModuleCreateInfo, or NULL on failure
  */
-extern DECLSPEC SDL_GpuShaderModule* SDLCALL SHD_CreateFromSPIRV(SDL_GpuBackend backend, void* bytes, size_t numbytes);
+extern DECLSPEC const char* SDLCALL SHD_TranslateFromSPIRV(SDL_GpuBackend backend, void* spirv, size_t spirv_size, size_t* output_size);
 
 /**
  * Report SDL_shader errors

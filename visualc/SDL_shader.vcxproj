@@ -19,7 +19,60 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\external\glslang\glslang\CInterface\glslang_c_interface.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\GenericCodeGen\CodeGen.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\GenericCodeGen\Link.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\attribute.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\Constant.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\glslang_tab.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\InfoSink.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\Initialize.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\Intermediate.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\intermOut.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\IntermTraverse.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\iomapper.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\limits.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\linkValidate.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\parseConst.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\ParseContextBase.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\ParseHelper.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\PoolAlloc.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\preprocessor\Pp.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\preprocessor\PpAtom.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\preprocessor\PpContext.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\preprocessor\PpScanner.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\preprocessor\PpTokens.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\propagateNoContraction.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\reflection.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\RemoveTree.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\Scan.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\ShaderLang.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\SpirvIntrinsics.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\SymbolTable.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\MachineIndependent\Versions.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\ResourceLimits\ResourceLimits.cpp" />
+    <ClCompile Include="..\external\glslang\glslang\ResourceLimits\resource_limits_c.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\CInterface\spirv_c_interface.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\GlslangToSpv.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\InReadableOrder.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\Logger.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\SpvBuilder.cpp" />
+    <ClCompile Include="..\external\glslang\SPIRV\SpvPostProcess.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_cfg.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_cross.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_cross_c.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_cross_parsed_ir.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_cross_util.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_glsl.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_hlsl.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_msl.cpp" />
+    <ClCompile Include="..\external\SPIRV-Cross\spirv_parser.cpp" />
     <ClCompile Include="..\src\SDL_shader.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\external\SDL\VisualC\SDL\SDL.vcxproj">
+      <Project>{81ce8daf-ebb2-4761-8e45-b71abcca8c68}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -30,26 +83,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -77,9 +130,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,9 +146,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,9 +162,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSL_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,9 +178,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLNDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
