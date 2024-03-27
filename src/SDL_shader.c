@@ -173,6 +173,7 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, const char* spirv, si
 
 	/* Early out for Vulkan since it consumes SPIR-V directly */
 	if (backend == SDL_GPU_BACKEND_VULKAN) {
+		*output_size = spirv_size;
 		return spirv;
 	}
 
