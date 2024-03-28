@@ -225,10 +225,6 @@ const char* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, const char* spirv, si
 	{
 	case SDL_GPU_BACKEND_D3D11:
 		spvc_compiler_options_set_uint(options, SPVC_COMPILER_OPTION_HLSL_SHADER_MODEL, 50);
-		spvc_compiler_options_set_bool(options, SPVC_COMPILER_OPTION_FLIP_VERTEX_Y, SPVC_TRUE);
-		break;
-	case SDL_GPU_BACKEND_METAL:
-		spvc_compiler_options_set_bool(options, SPVC_COMPILER_OPTION_FLIP_VERTEX_Y, SPVC_TRUE);
 		break;
 	default:
 		/* No special settings needed */
