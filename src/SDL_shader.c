@@ -152,7 +152,9 @@ const char* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	glslang_shader_delete(shader);
 
 	final_output = SHD_TranslateFromSPIRV(backend, spirv, spirv_size, output_size);
-	SDL_free(spirv);
+	if (backend != SDL_GPU_BACKEND_VULKAN) {
+		SDL_free(spirv);
+	}
 	return final_output;
 #else
 	SHD_SetError("SDL_shader was compiled without GLSL support");

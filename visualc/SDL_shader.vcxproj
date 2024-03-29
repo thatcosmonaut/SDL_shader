@@ -129,7 +129,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDL_SHADER_HAS_GLSLANG;DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -138,6 +138,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)..\external\glslang
+python .\build_info.py . -i  .\build_info.h.tmpl -o  .\glslang\build_info.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -145,7 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDL_SHADER_HAS_GLSLANG;DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLWIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -156,12 +160,16 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)..\external\glslang
+python .\build_info.py . -i  .\build_info.h.tmpl -o  .\glslang\build_info.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSL_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDL_SHADER_HAS_GLSLANG;DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSL_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -170,6 +178,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)..\external\glslang
+python .\build_info.py . -i  .\build_info.h.tmpl -o  .\glslang\build_info.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -177,7 +189,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLNDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDL_SHADER_HAS_GLSLANG;DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;SPIRV_CROSS_STATIC;SPIRV_CROSS_ENABLE_HLSL;SPIRV_CROSS_ENABLE_GLSL;SPIRV_CROSS_ENABLE_MSL;SPIRV_CROSS_ENABLE_C_API;SPIRV_CROSS_C_API_HLSL;SPIRV_CROSS_C_API_GLSL;SPIRV_CROSS_C_API_MSL;SPIRV_CROSS_C_API_HLSLNDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(SolutionDir)..\external\SDL\include;$(IncludePath);$(SolutionDir)..\external\SPIRV-Cross;$(SolutionDir)..\external\glslang</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -188,6 +200,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)..\external\glslang
+python .\build_info.py . -i  .\build_info.h.tmpl -o  .\glslang\build_info.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
