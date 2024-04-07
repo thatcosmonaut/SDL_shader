@@ -79,6 +79,7 @@
     <ProjectGuid>{e50ca524-08b8-4061-8c3e-0150faf9c478}</ProjectGuid>
     <RootNamespace>SDLshader</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SDL3_shader</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
