@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
     /* Direct SPIR-V conversion */
     then = SDL_GetTicks();
-    hlslText = SHD_TranslateFromSPIRV(SDL_GPU_BACKEND_D3D11, SPIRV_CODE, SDL_arraysize(SPIRV_CODE), &hlslLength);
+    hlslText = SHD_TranslateFromSPIRV(SDL_GPU_BACKEND_D3D11, SDL_GPU_SHADERTYPE_FRAGMENT, SPIRV_CODE, SDL_arraysize(SPIRV_CODE), &hlslLength);
     if (!hlslText)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s\n", SHD_GetError());
