@@ -143,8 +143,11 @@ static void* D3D11_CompileShader(SDL_GpuShaderType shaderType, const char* sourc
 	return copied_bytecode;
 }
 #else
-static void* D3D11_CompileShader(SDL_GpuShaderType shaderType, const char* source)
+static void* D3D11_CompileShader(SDL_GpuShaderType shaderType, const char* source, size_t *output_size)
 {
+	(void)shaderType;
+	(void)source;
+	*output_size = 0;
 	SHD_SetError("SDL was not configured with D3D11 support");
 	return NULL;
 }
