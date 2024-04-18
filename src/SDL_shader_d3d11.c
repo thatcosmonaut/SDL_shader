@@ -79,7 +79,7 @@ const char* profiles[] = { "vs_5_0", "ps_5_0", "cs_5_0" };
 static void* d3dcompiler_dll;
 static PFN_D3DCOMPILE D3DCompile_func;
 
-static int D3D11_Init()
+static int D3D11_Init(void)
 {
 	/* Load the DLL if we haven't already */
 	if (!d3dcompiler_dll) {
@@ -98,9 +98,11 @@ static int D3D11_Init()
 			return -1;
 		}
 	}
+
+	return 0;
 }
 
-static void D3D11_Quit()
+static void D3D11_Quit(void)
 {
 	if (d3dcompiler_dll) {
 		SDL_UnloadObject(d3dcompiler_dll);
@@ -119,7 +121,6 @@ static SDL_GpuShaderModule* D3D11_CompileFromSource(SDL_GpuDevice* device, SDL_G
 	HRESULT result;
 	ID3DBlob *blob;
 	ID3DBlob *error_blob;
-	void* copied_bytecode;
 	SDL_GpuShaderModuleCreateInfo createinfo;
 	SDL_GpuShaderModule *shader_module;
 
