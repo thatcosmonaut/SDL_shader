@@ -1,159 +1,12 @@
-#include <SDL3_shader/SDL_shader.h>
-#include <build_config/SDL_build_config.h>
-#include <spirv_cross_c.h>
+#include "SDL_shader_internal.h"
 #if SDL_SHADER_HAS_GLSLANG
 #include <glslang/Include/glslang_c_interface.h>
 #include <glslang/Public/resource_limits_c.h>
 #endif
 
-/* D3DCompiler API */
-
-static void* d3dcompiler_dll;
-
-#if SDL_GPU_D3D11
-
-#define CINTERFACE
-#define COBJMACROS
-#include <d3dcompiler.h>
-
-/* __stdcall declaration, largely taken from vkd3d_windows.h */
-#ifdef _WIN32
-#define D3DCOMPILER_API __stdcall
-#else
-# ifdef __stdcall
-#  undef __stdcall
-# endif
-# ifdef __x86_64__
-#  define __stdcall __attribute__((ms_abi))
-# else
-#  if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)) || defined(__APPLE__)
-#   define __stdcall __attribute__((__stdcall__)) __attribute__((__force_align_arg_pointer__))
-#  else
-#   define __stdcall __attribute__((__stdcall__))
-#  endif
-# endif
-# define D3DCOMPILER_API __stdcall
-#endif
-
-/* vkd3d uses stdcall for its ID3D10Blob implementation */
-#ifndef _WIN32
-typedef struct VKD3DBlob VKD3DBlob;
-typedef struct VKD3DBlobVtbl
-{
-	HRESULT(__stdcall* QueryInterface)(
-		VKD3DBlob* This,
-		REFIID riid,
-		void** ppvObject);
-	ULONG(__stdcall* AddRef)(VKD3DBlob* This);
-	ULONG(__stdcall* Release)(VKD3DBlob* This);
-	LPVOID(__stdcall* GetBufferPointer)(VKD3DBlob* This);
-	SIZE_T(__stdcall* GetBufferSize)(VKD3DBlob* This);
-} VKD3DBlobVtbl;
-struct VKD3DBlob
-{
-	const VKD3DBlobVtbl* lpVtbl;
-};
-#define ID3D10Blob VKD3DBlob
-#define ID3DBlob VKD3DBlob
-#endif
-
-/* rename the DLL for different platforms */
-#if defined(WIN32)
-  #undef D3DCOMPILER_DLL
-  #define D3DCOMPILER_DLL D3DCOMPILER_DLL_A
-#elif defined(__APPLE__)
-  #undef D3DCOMPILER_DLL
-  #define D3DCOMPILER_DLL "libvkd3d-utils.1.dylib"
-#else
-  #undef D3DCOMPILER_DLL
-  #define D3DCOMPILER_DLL "libvkd3d-utils.so.1"
-#endif
-
-/* D3DCompile signature */
-typedef HRESULT(D3DCOMPILER_API* PFN_D3DCOMPILE)(
-	LPCVOID pSrcData,
-	SIZE_T SrcDataSize,
-	LPCSTR pSourceName,
-	const D3D_SHADER_MACRO* pDefines,
-	ID3DInclude* pInclude,
-	LPCSTR pEntrypoint,
-	LPCSTR pTarget,
-	UINT Flags1,
-	UINT Flags2,
-	ID3DBlob** ppCode,
-	ID3DBlob** ppErrorMsgs
-);
-
-static void* D3D11_CompileShader(SDL_GpuShaderType shaderType, const char* source, size_t *output_size)
-{
-	static PFN_D3DCOMPILE D3DCompileFunc;
-	const char* profiles[] = {"vs_5_0", "ps_5_0", "cs_5_0"};
-	HRESULT result;
-	ID3DBlob* blob;
-	ID3DBlob* error_blob;
-	void* copied_bytecode;
-
-	/* Load the DLL if we haven't already */
-	if (!d3dcompiler_dll) {
-		d3dcompiler_dll = SDL_LoadObject(D3DCOMPILER_DLL);
-		if (!d3dcompiler_dll) {
-			SHD_SetError("Failed to load %s", D3DCOMPILER_DLL);
-			*output_size = 0;
-			return NULL;
-		}
-	}
-
-	/* Load the D3DCompile function if we haven't already */
-	if (!D3DCompileFunc) {
-		D3DCompileFunc = (PFN_D3DCOMPILE) SDL_LoadFunction(d3dcompiler_dll, "D3DCompile");
-		if (!D3DCompileFunc) {
-			SHD_SetError("Failed to load D3DCompile function");
-			*output_size = 0;
-			return NULL;
-		}
-	}
-
-	/* Compile! */
-	result = D3DCompileFunc(
-		source,
-		SDL_strlen(source),
-		NULL,
-		NULL,
-		NULL,
-		"main",
-		profiles[shaderType],
-		0,
-		0,
-		&blob,
-		&error_blob
-	);
-	if (result < 0) {
-		SHD_SetError("%s", (const char*) ID3D10Blob_GetBufferPointer(error_blob));
-		ID3D10Blob_Release(error_blob);
-		*output_size = 0;
-		return NULL;
-	}
-
-	/* Make a copy of the compiled bytecode */
-	*output_size = ID3D10Blob_GetBufferSize(blob);
-	copied_bytecode = SDL_malloc(*output_size);
-	SDL_memcpy(copied_bytecode, ID3D10Blob_GetBufferPointer(blob), *output_size);
-	ID3D10Blob_Release(blob);
-
-	return copied_bytecode;
-}
-#else
-static void* D3D11_CompileShader(SDL_GpuShaderType shaderType, const char* source, size_t *output_size)
-{
-	(void)shaderType;
-	(void)source;
-	*output_size = 0;
-	SHD_SetError("SDL was not configured with D3D11 support");
-	return NULL;
-}
-#endif
-
-/* Public API */
+static int initialized;
+static SHD_Driver *shd_driver;
+static SDL_GpuDevice *gpu_device;
 
 const SDL_Version *SHD_Linked_Version(void)
 {
@@ -162,7 +15,7 @@ const SDL_Version *SHD_Linked_Version(void)
     return(&linked_version);
 }
 
-int SHD_Init(void)
+int SHD_Init(SDL_GpuDevice *device)
 {
 #if SDL_SHADER_HAS_GLSLANG
 	if (!glslang_initialize_process()) {
@@ -199,21 +52,55 @@ int SHD_Init(void)
 	glslang_shader_delete(shader);
 #endif
 
+	if (!device) {
+		SHD_SetError("SHD_Init: device is null");
+		return -1;
+	}
+
+	switch (SDL_GpuGetBackend(device))
+	{
+#if SDL_GPU_VULKAN
+	case SDL_GPU_BACKEND_VULKAN:
+		shd_driver = &VulkanDriver;
+		break;
+#endif
+#if SDL_GPU_D3D11
+	case SDL_GPU_BACKEND_D3D11:
+		shd_driver = &D3D11Driver;
+		break;
+#endif
+#if SDL_GPU_METAL
+	case SDL_GPU_BACKEND_METAL:
+		shd_driver = &MetalDriver;
+		break;
+#endif
+	default:
+		SHD_SetError("SHD_Init: Unsupported backend");
+		return -1;
+	}
+
+	if (shd_driver->Init() < 0) {
+		return -1;
+	}
+	gpu_device = device;
+	initialized = 1;
 	return 0;
 }
 
 void SHD_Quit(void)
 {
+	if (initialized) {
+		shd_driver->Quit();
+		shd_driver = NULL;
+		gpu_device = NULL;
+		initialized = 0;
 #if SDL_SHADER_HAS_GLSLANG
-	glslang_finalize_process();
+		glslang_finalize_process();
 #endif
-
-	if (d3dcompiler_dll) {
-		SDL_UnloadObject(d3dcompiler_dll);
 	}
 }
 
-const void* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, const char* glsl, size_t *output_size)
+SDL_GpuShaderModule* SHD_CreateShaderModuleFromGLSL(SDL_GpuShaderStage shader_stage, const char* glsl)
 {
 #if SDL_SHADER_HAS_GLSLANG
 	glslang_input_t input;
@@ -223,21 +110,21 @@ const void* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	size_t spirv_size = 0;
 	void* spirv = NULL;
 	const char *spirv_messages = NULL;
-	const void* final_output = NULL;
+	SDL_GpuShaderModule *shader_module = NULL;
 
-	switch (shaderType)
+	switch (shader_stage)
 	{
-	case SDL_GPU_SHADERTYPE_VERTEX:
+	case SDL_GPU_SHADERSTAGE_VERTEX:
 		stage = GLSLANG_STAGE_VERTEX;
 		break;
-	case SDL_GPU_SHADERTYPE_FRAGMENT:
+	case SDL_GPU_SHADERSTAGE_FRAGMENT:
 		stage = GLSLANG_STAGE_FRAGMENT;
 		break;
-	case SDL_GPU_SHADERTYPE_COMPUTE:
+	case SDL_GPU_SHADERSTAGE_COMPUTE:
 		stage = GLSLANG_STAGE_COMPUTE;
 		break;
 	default:
-		SHD_SetError("SHD_TranslateFromGLSL: unknown shader type");
+		SHD_SetError("SHD_TranslateFromGLSL: unknown shader stage");
 		return NULL;
 	}
 
@@ -305,46 +192,33 @@ const void* SHD_TranslateFromGLSL(SDL_GpuBackend backend, SDL_GpuShaderType shad
 	glslang_program_delete(program);
 	glslang_shader_delete(shader);
 
-	final_output = SHD_TranslateFromSPIRV(backend, shaderType, spirv, spirv_size, output_size);
-	if (backend != SDL_GPU_BACKEND_VULKAN) {
-		SDL_free(spirv);
-	}
-	return final_output;
+	shader_module = SHD_CreateShaderModuleFromSPIRV(shader_stage, spirv, spirv_size);
+	SDL_free(spirv);
+	return shader_module;
 #else
 	SHD_SetError("SDL_shader was compiled without GLSL support");
 	return NULL;
 #endif
 }
 
-const void* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, SDL_GpuShaderType shaderType, const char* spirv, size_t spirv_size, size_t *output_size)
+SDL_GpuShaderModule* SHD_CreateShaderModuleFromSPIRV(SDL_GpuShaderStage shader_stage, const char* spirv, size_t spirv_size)
 {
-	spvc_backend spvc_backend;
+	SDL_GpuShaderModuleCreateInfo createinfo;
+	SDL_GpuShaderModule *shader_module;
 	spvc_result result;
 	spvc_context context = NULL;
 	spvc_parsed_ir ir = NULL;
 	spvc_compiler compiler = NULL;
 	spvc_compiler_options options = NULL;
 	const char* translated = NULL;
-	void* final_bytecode = NULL;
 
-	/* Early out for Vulkan since it consumes SPIR-V directly */
-	if (backend == SDL_GPU_BACKEND_VULKAN) {
-		*output_size = spirv_size;
-		return spirv;
-	}
-
-	/* Determine which backend to use */
-	switch (backend)
-	{
-	case SDL_GPU_BACKEND_D3D11:
-		spvc_backend = SPVC_BACKEND_HLSL;
-		break;
-	case SDL_GPU_BACKEND_METAL:
-		spvc_backend = SPVC_BACKEND_MSL;
-		break;
-	default:
-		SHD_SetError("SHD_TranslateFromSPIRV: unknown GPU backend");
-		return NULL;
+	/* Fast path for drivers that consume SPIR-V directly */
+	if (shd_driver->ConsumesSPIRV) {
+		createinfo.code = spirv;
+		createinfo.codeSize = spirv_size;
+		createinfo.stage = shader_stage;
+		createinfo.format = SDL_GPU_SHADERFORMAT_SPIRV;
+		return SDL_GpuCreateShaderModule(gpu_device, &createinfo);
 	}
 
 	/* Create the SPIRV-Cross context */
@@ -362,14 +236,15 @@ const void* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, SDL_GpuShaderType sha
 		return NULL;
 	}
 
-	/* Set up the cross-compiler */
-	result = spvc_context_create_compiler(context, spvc_backend, ir, SPVC_CAPTURE_MODE_TAKE_OWNERSHIP, &compiler);
+	/* Create the cross-compiler */
+	result = spvc_context_create_compiler(context, shd_driver->SpvcBackend, ir, SPVC_CAPTURE_MODE_TAKE_OWNERSHIP, &compiler);
 	if (result < 0) {
 		SHD_SetError("SHD_TranslateFromSPIRV: compiler creation failed: %s", spvc_context_get_last_error_string(context));
 		spvc_context_destroy(context);
 		return NULL;
 	}
 
+	/* Set up the cross-compiler options */
 	result = spvc_compiler_create_compiler_options(compiler, &options);
 	if (result < 0) {
 		SHD_SetError("SHD_TranslateFromSPIRV: compiler options creation failed: %s", spvc_context_get_last_error_string(context));
@@ -377,15 +252,7 @@ const void* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, SDL_GpuShaderType sha
 		return NULL;
 	}
 
-	switch (backend)
-	{
-	case SDL_GPU_BACKEND_D3D11:
-		spvc_compiler_options_set_uint(options, SPVC_COMPILER_OPTION_HLSL_SHADER_MODEL, 50);
-		break;
-	default:
-		/* No special settings needed */
-		break;
-	}
+	shd_driver->SetCompilerOptions(options);
 
 	result = spvc_compiler_install_compiler_options(compiler, options);
 	if (result < 0) {
@@ -402,22 +269,11 @@ const void* SHD_TranslateFromSPIRV(SDL_GpuBackend backend, SDL_GpuShaderType sha
 		return NULL;
 	}
 
-	/* Compile the translated shader */
-	switch (backend)
-	{
-	case SDL_GPU_BACKEND_D3D11:
-		final_bytecode = D3D11_CompileShader(shaderType, translated, output_size);
-		break;
-	case SDL_GPU_BACKEND_METAL:
-		/* FIXME: Compile into MTLLibrary */
-		break;
-	default:
-		/* Just return the shader as-is */
-		break;
-	}
+	/* Compile the shader module */
+	shader_module = shd_driver->CompileFromSource(gpu_device, shader_stage, translated);
 
 	/* Clean up */
 	spvc_context_destroy(context);
 
-	return final_bytecode;
+	return shader_module;
 }

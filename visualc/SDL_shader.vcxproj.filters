@@ -165,5 +165,22 @@
     <ClCompile Include="..\external\glslang\SPIRV\Logger.cpp">
       <Filter>Source Files\glslang</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SDL_shader_vulkan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SDL_shader_dummy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SDL_shader_d3d11.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SDL_shader_metal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\SDL_shader_internal.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

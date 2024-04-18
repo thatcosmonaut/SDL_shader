@@ -94,6 +94,10 @@ endif()
 
 add_library(${sdl3_shader_target_name}
     src/SDL_shader.c
+    src/SDL_shader_dummy.c
+    src/SDL_shader_d3d11.c
+    src/SDL_shader_metal.c
+    src/SDL_shader_vulkan.c
 )
 add_library(SDL3_shader::${sdl3_shader_target_name} ALIAS ${sdl3_shader_target_name})
 if(NOT TARGET SDL3_shader::SDL3_shader)

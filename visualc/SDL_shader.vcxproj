@@ -67,11 +67,18 @@
     <ClCompile Include="..\external\SPIRV-Cross\spirv_msl.cpp" />
     <ClCompile Include="..\external\SPIRV-Cross\spirv_parser.cpp" />
     <ClCompile Include="..\src\SDL_shader.c" />
+    <ClCompile Include="..\src\SDL_shader_d3d11.c" />
+    <ClCompile Include="..\src\SDL_shader_dummy.c" />
+    <ClCompile Include="..\src\SDL_shader_metal.c" />
+    <ClCompile Include="..\src\SDL_shader_vulkan.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\external\SDL\VisualC\SDL\SDL.vcxproj">
       <Project>{81ce8daf-ebb2-4761-8e45-b71abcca8c68}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\SDL_shader_internal.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
