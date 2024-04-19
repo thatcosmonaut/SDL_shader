@@ -329,17 +329,18 @@ if(SDL3SHADER_INSTALL)
 endif()
 
 if(SDL3SHADER_SAMPLES)
-    add_executable(convertshader examples/convertshader.c)
+    # FIXME: Add better samples!
+    # add_executable(convertshader examples/convertshader.c)
 
-    foreach(prog convertshader)
-        sdl_add_warning_options(${prog} WARNING_AS_ERROR ${SDL3SHADER_WERROR})
-        target_link_libraries(${prog} PRIVATE SDL3_shader::${sdl3_shader_target_name})
-        target_link_libraries(${prog} PRIVATE ${sdl3_target_name})
+    # foreach(prog convertshader)
+    #     sdl_add_warning_options(${prog} WARNING_AS_ERROR ${SDL3SHADER_WERROR})
+    #     target_link_libraries(${prog} PRIVATE SDL3_shader::${sdl3_shader_target_name})
+    #     target_link_libraries(${prog} PRIVATE ${sdl3_target_name})
 
-        if(SDL3SHADER_SAMPLES_INSTALL)
-            install(TARGETS ${prog}
-                RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-            )
-        endif()
-    endforeach()
+    #     if(SDL3SHADER_SAMPLES_INSTALL)
+    #         install(TARGETS ${prog}
+    #             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    #         )
+    #     endif()
+    # endforeach()
 endif()
