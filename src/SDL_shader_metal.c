@@ -5,14 +5,11 @@
 static SDL_GpuShaderModule* Metal_CompileFromSource(SDL_GpuDevice *device, SDL_GpuShaderStage shader_stage, const char* source)
 {
 	SDL_GpuShaderModuleCreateInfo createinfo;
-	SDL_GpuShaderModule* shader_module;
-
-	createinfo.code = source;
+	createinfo.code = (const Uint8*) source;
 	createinfo.codeSize = SDL_strlen(source);
 	createinfo.format = SDL_GPU_SHADERFORMAT_MSL;
 	createinfo.stage = shader_stage;
-
-	return SDL_GpuCreateShaderModule(device, &shader_module);
+	return SDL_GpuCreateShaderModule(device, &createinfo);
 }
 
 SHD_Driver MetalDriver =
