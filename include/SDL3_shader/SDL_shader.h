@@ -76,7 +76,7 @@ extern DECLSPEC const SDL_Version * SDLCALL SHD_Linked_Version(void);
 /**
  * This function initializes the SDL_shader system.
  * It MUST be called before calling any other SHD_Translate* APIs!
- * \param The GpuDevice to use for creating shader modules
+ * \param The GpuDevice to use for creating shaders
  * \returns Success code (0 on success, -1 on failure)
  */
 extern DECLSPEC int SDLCALL SHD_Init(SDL_GpuDevice *device);
@@ -88,22 +88,22 @@ extern DECLSPEC int SDLCALL SHD_Init(SDL_GpuDevice *device);
 extern DECLSPEC void SDLCALL SHD_Quit(void);
 
 /**
- * This function translates and compiles source GLSL into a shader module.
+ * This function translates and compiles source GLSL into a shader.
  * If needed, the GLSL source may be first translated into SPIR-V, then to the target language.
  * \param shaderType The SDL_GpuShaderType of the GLSL
  * \param glsl The GLSL source code
- * \returns An SDL_GpuShaderModule built from the translated shader code, or NULL on failure
+ * \returns An SDL_GpuShader built from the translated shader code, or NULL on failure
  */
-extern DECLSPEC SDL_GpuShaderModule* SDLCALL SHD_CreateShaderModuleFromGLSL(SDL_GpuShaderStage shader_stage, const char* glsl);
+extern DECLSPEC SDL_GpuShader* SDLCALL SHD_CreateShaderFromGLSL(SDL_GpuShaderStageFlagBits shader_stage, const char* entryPointName, const char* glsl);
 
 /**
- * This function translates and compiles source SPIR-V into a shader module.
+ * This function translates and compiles source SPIR-V into a shader.
  * \param shader_stage The SDL_GpuShaderStage of the SPIR-V
  * \param spirv A pointer to the source SPIR-V data
  * \param spirv_size The length of the source SPIR-V data, in bytes
- * \returns An SDL_GpuShaderModule built from the translated shader code, or NULL on failure
+ * \returns An SDL_GpuShader built from the translated shader code, or NULL on failure
  */
-extern DECLSPEC SDL_GpuShaderModule* SDLCALL SHD_CreateShaderModuleFromSPIRV(SDL_GpuShaderStage shader_stage, const char* spirv, size_t spirv_size);
+extern DECLSPEC SDL_GpuShader* SDLCALL SHD_CreateShaderFromSPIRV(SDL_GpuShaderStageFlagBits shader_stage, const char* entryPointName, const char* spirv, size_t spirv_size);
 
 /**
  * Report SDL_shader errors

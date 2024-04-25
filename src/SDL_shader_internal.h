@@ -12,14 +12,14 @@ typedef struct SHD_Driver
 	int (*Init)(void);
 	void (*Quit)(void);
 	void (*SetCompilerOptions)(spvc_compiler_options options);
-	SDL_GpuShaderModule* (*CompileFromSource)(SDL_GpuDevice* device, SDL_GpuShaderStage shader_stage, const char* source);
+	SDL_GpuShader* (*CompileFromSource)(SDL_GpuDevice* device, SDL_GpuShaderStageFlagBits shader_stage, const char* entryPointName, const char* source);
 } SHD_Driver;
 
 /* FIXME: Do we need some sort of visibility attribute here? */
 int Dummy_Init(void);
 void Dummy_Quit(void);
 void Dummy_SetCompilerOptions(spvc_compiler_options options);
-SDL_GpuShaderModule* Dummy_CompileFromSource(SDL_GpuDevice* device, SDL_GpuShaderStage shader_stage, const char* source);
+SDL_GpuShader* Dummy_CompileFromSource(SDL_GpuDevice* device, SDL_GpuShaderStageFlagBits shader_stage, const char* entryPointName, const char* source);
 
 extern SHD_Driver VulkanDriver;
 extern SHD_Driver D3D11Driver;

@@ -100,7 +100,7 @@ void SHD_Quit(void)
 	}
 }
 
-SDL_GpuShaderModule* SHD_CreateShaderModuleFromGLSL(SDL_GpuShaderStage shader_stage, const char* glsl)
+SDL_GpuShader* SHD_CreateShaderFromGLSL(SDL_GpuShaderStageFlagBits shader_stage, const char* entryPointName, const char* glsl)
 {
 #if SDL_SHADER_HAS_GLSLANG
 	glslang_input_t input;
@@ -110,7 +110,7 @@ SDL_GpuShaderModule* SHD_CreateShaderModuleFromGLSL(SDL_GpuShaderStage shader_st
 	size_t spirv_size = 0;
 	void* spirv = NULL;
 	const char *spirv_messages = NULL;
-	SDL_GpuShaderModule *shader_module = NULL;
+	SDL_GpuShader *sdlShader = NULL;
 
 	switch (shader_stage)
 	{
@@ -192,19 +192,19 @@ SDL_GpuShaderModule* SHD_CreateShaderModuleFromGLSL(SDL_GpuShaderStage shader_st
 	glslang_program_delete(program);
 	glslang_shader_delete(shader);
 
-	shader_module = SHD_CreateShaderModuleFromSPIRV(shader_stage, spirv, spirv_size);
+	sdlShader = SHD_CreateShaderFromSPIRV(shader_stage, entryPointName, spirv, spirv_size);
 	SDL_free(spirv);
-	return shader_module;
+	return sdlShader;
 #else
 	SHD_SetError("SDL_shader was compiled without GLSL support");
 	return NULL;
 #endif
 }
 
-SDL_GpuShaderModule* SHD_CreateShaderModuleFromSPIRV(SDL_GpuShaderStage shader_stage, const char* spirv, size_t spirv_size)
+SDL_GpuShader* SHD_CreateShaderFromSPIRV(SDL_GpuShaderStageFlagBits shader_stage, const char *entryPointName, const char* spirv, size_t spirv_size)
 {
-	SDL_GpuShaderModuleCreateInfo createinfo;
-	SDL_GpuShaderModule *shader_module;
+	SDL_GpuShaderCreateInfo createinfo;
+	SDL_GpuShader *shader;
 	spvc_result result;
 	spvc_context context = NULL;
 	spvc_parsed_ir ir = NULL;
@@ -218,7 +218,8 @@ SDL_GpuShaderModule* SHD_CreateShaderModuleFromSPIRV(SDL_GpuShaderStage shader_s
 		createinfo.codeSize = spirv_size;
 		createinfo.stage = shader_stage;
 		createinfo.format = SDL_GPU_SHADERFORMAT_SPIRV;
-		return SDL_GpuCreateShaderModule(gpu_device, &createinfo);
+		createinfo.entryPointName = entryPointName;
+		return SDL_GpuCreateShader(gpu_device, &createinfo);
 	}
 
 	/* Create the SPIRV-Cross context */
@@ -269,11 +270,11 @@ SDL_GpuShaderModule* SHD_CreateShaderModuleFromSPIRV(SDL_GpuShaderStage shader_s
 		return NULL;
 	}
 
-	/* Compile the shader module */
-	shader_module = shd_driver->CompileFromSource(gpu_device, shader_stage, translated);
+	/* Compile the shader */
+	shader = shd_driver->CompileFromSource(gpu_device, shader_stage, entryPointName, translated);
 
 	/* Clean up */
 	spvc_context_destroy(context);
 
-	return shader_module;
+	return shader;
 }

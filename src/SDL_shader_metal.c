@@ -2,14 +2,15 @@
 
 #if SDL_GPU_METAL
 
-static SDL_GpuShaderModule* Metal_CompileFromSource(SDL_GpuDevice *device, SDL_GpuShaderStage shader_stage, const char* source)
+static SDL_GpuShader* Metal_CompileFromSource(SDL_GpuDevice *device, SDL_GpuShaderStage shader_stage, const char* entryPointName, const char* source)
 {
-	SDL_GpuShaderModuleCreateInfo createinfo;
+	SDL_GpuShaderCreateInfo createinfo;
 	createinfo.code = (const Uint8*) source;
 	createinfo.codeSize = SDL_strlen(source);
 	createinfo.format = SDL_GPU_SHADERFORMAT_MSL;
 	createinfo.stage = shader_stage;
-	return SDL_GpuCreateShaderModule(device, &createinfo);
+	createinfo.entryPointName = entryPointName;
+	return SDL_GpuCreateShader(device, &createinfo);
 }
 
 SHD_Driver MetalDriver =

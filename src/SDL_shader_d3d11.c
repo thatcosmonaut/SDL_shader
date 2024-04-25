@@ -74,8 +74,6 @@ typedef HRESULT(D3DCOMPILER_API* PFN_D3DCOMPILE)(
 	ID3DBlob** ppErrorMsgs
 );
 
-const char* profiles[] = { "vs_5_0", "ps_5_0", "cs_5_0" };
-
 static void* d3dcompiler_dll;
 static PFN_D3DCOMPILE D3DCompile_func;
 
@@ -116,13 +114,32 @@ static void D3D11_SetCompilerOptions(spvc_compiler_options options)
 	spvc_compiler_options_set_uint(options, SPVC_COMPILER_OPTION_HLSL_SHADER_MODEL, 50);
 }
 
-static SDL_GpuShaderModule* D3D11_CompileFromSource(SDL_GpuDevice* device, SDL_GpuShaderStage shader_stage, const char* source)
+static SDL_GpuShader* D3D11_CompileFromSource(SDL_GpuDevice* device, SDL_GpuShaderStageFlagBits shader_stage, const char *entryPointName, const char* source)
 {
 	HRESULT result;
 	ID3DBlob *blob;
 	ID3DBlob *error_blob;
-	SDL_GpuShaderModuleCreateInfo createinfo;
-	SDL_GpuShaderModule *shader_module;
+	SDL_GpuShaderCreateInfo createinfo;
+	SDL_GpuShader *shader;
+	const char *profile;
+
+	if (shader_stage == SDL_GPU_SHADERSTAGE_VERTEX)
+	{
+		profile = "vs_5_0";
+	}
+	else if (shader_stage == SDL_GPU_SHADERSTAGE_FRAGMENT)
+	{
+		profile = "ps_5_0";
+	}
+	else if (shader_stage == SDL_GPU_SHADERSTAGE_COMPUTE)
+	{
+		profile = "cs_5_0";
+	}
+	else
+	{
+		SHD_SetError("%s", "Unrecognized shader stage!");
+		return NULL;
+	}
 
 	/* Compile! */
 	result = D3DCompile_func(
@@ -131,8 +148,8 @@ static SDL_GpuShaderModule* D3D11_CompileFromSource(SDL_GpuDevice* device, SDL_G
 		NULL,
 		NULL,
 		NULL,
-		"main",
-		profiles[shader_stage],
+		"main", /* entry point name ignored */
+		profile,
 		0,
 		0,
 		&blob,
@@ -144,17 +161,18 @@ static SDL_GpuShaderModule* D3D11_CompileFromSource(SDL_GpuDevice* device, SDL_G
 		return NULL;
 	}
 
-	/* Create the shader module */
+	/* Create the shader */
 	createinfo.code = ID3D10Blob_GetBufferPointer(blob);
 	createinfo.codeSize = ID3D10Blob_GetBufferSize(blob);
 	createinfo.format = SDL_GPU_SHADERFORMAT_DXBC;
 	createinfo.stage = shader_stage;
-	shader_module = SDL_GpuCreateShaderModule(device, &createinfo);
+	createinfo.entryPointName = entryPointName;
+	shader = SDL_GpuCreateShader(device, &createinfo);
 
 	/* Clean up */
 	ID3D10Blob_Release(blob);
 
-	return shader_module;
+	return shader;
 }
 
 SHD_Driver D3D11Driver =
